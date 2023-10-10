@@ -24,8 +24,4 @@
     <PackageReference Include="Tutu"/>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Behaviors\System\"/>
-  </ItemGroup>
-
 </Project>

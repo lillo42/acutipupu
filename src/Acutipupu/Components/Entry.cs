@@ -15,7 +15,7 @@ namespace Acutipupu.Components;
 /// <summary>
 /// The input component.
 /// </summary>
-public partial class Entry : Component, INavegable, ITextChanged, IStyled, IText
+public partial class Entry : Component, INavegable, ITextChanged, IStyled 
 {
     private Text _finalText;
     private readonly Paragraph _paragraph = new();
@@ -33,7 +33,7 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled, IText
     /// <summary>
     /// The last column position.
     /// </summary>
-    [ObservableProperty] private IColumnPosition _lastColumnPosition = new AtCursorPosition(0);
+    [ObservableProperty] private AtColumnPosition _lastColumnPosition = new(0);
 
     /// <summary>
     /// The text value.
@@ -84,18 +84,6 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled, IText
     [ObservableProperty] private Margin _margin = new(6, 6);
 
     /// <summary>
-    /// The scroll position.
-    /// </summary>
-    /// <remarks>
-    /// If not null, the entry will scroll to the specified position.
-    /// <para></para>
-    /// If null, the entry will scroll to the cursor position.
-    /// <para></para>
-    /// When user execute an action that moves the cursor, add a text or another action that is not to move scroll, the scroll position will be set to null.
-    /// </remarks>
-    [ObservableProperty] private (int Row, int Column)? _scroll;
-
-    /// <summary>
     /// The screen area.
     /// </summary>
     /// <remarks>
@@ -122,7 +110,7 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled, IText
     }
 
     /// <inheritdoc />
-    public TextKeyMap? KeyMap { get; set; }
+    public EntryKeyMap? KeyMap { get; set; }
 
     /// <summary>
     /// The <see cref="Text"/> <see cref="IBindableProperty{TSource,TProperty}"/>.
@@ -192,15 +180,6 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled, IText
             (input, value) => input.Margin = value);
 
     /// <summary>
-    /// The <see cref="Scroll"/> <see cref="IBindableProperty{TSource,TProperty}"/>.
-    /// </summary>
-    public static IBindableProperty<Entry, (int Row, int Column)?> ScrollProperty { get; } =
-        new BindableProperty<Entry, (int Row, int Column)?>(
-            nameof(Scroll),
-            input => input.Scroll,
-            (input, value) => input.Scroll = value);
-
-    /// <summary>
     /// The <see cref="MultiLine"/> <see cref="IBindableProperty{TSource,TProperty}"/>.
     /// </summary>
     public static IBindableProperty<Entry, bool> MultiLineProperty { get; } =
@@ -217,12 +196,12 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled, IText
             nameof(EndOfBufferCharacter),
             input => input.EndOfBufferCharacter,
             (input, value) => input.EndOfBufferCharacter = value);
-    
+
     /// <summary>
     /// The <see cref="LastColumnPosition"/> <see cref="IBindableProperty{TSource,TProperty}"/>.
     /// </summary>
-    public  static IBindableProperty<Entry, IColumnPosition> LastColumnPositionProperty { get; } =
-        new BindableProperty<Entry, IColumnPosition>(
+    public static IBindableProperty<Entry, AtColumnPosition> LastColumnPositionProperty { get; } =
+        new BindableProperty<Entry, AtColumnPosition>(
             nameof(LastColumnPosition),
             input => input.LastColumnPosition,
             (input, value) => input.LastColumnPosition = value);
@@ -363,9 +342,22 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled, IText
         {
             throw new ArgumentException("Column is out of range");
         }
-
-        Scroll = null;
     }
+
+    partial void OnScreenAreaChanging(Rect value)
+    {
+        if (value.Y < 0 || value.Y > Indexes.Count)
+        {
+            throw new InvalidOperationException("Y is out of range");
+        }
+
+        var maxCol = Indexes.MaxBy(x => x.Length);
+        if (value.X < 0 || value.X > maxCol.Length)
+        {
+            throw new InvalidOperationException("X is out of range");
+        }
+    }
+
 
     /// <inheritdoc />
     public override void Dispose()

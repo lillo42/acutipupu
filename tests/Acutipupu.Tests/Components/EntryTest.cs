@@ -1046,104 +1046,110 @@ public class EntryTest
 
     #endregion
 
-    #region Set Scroll
+    #region Set Screen Area
 
     [Fact]
-    public void SetScroll()
+    public void SetScreenArea()
     {
-        var value = _fixture.Create<(int, int)>();
-        _component.SetScroll(value)
-            .Scroll.Should().Be(value);
+        var value = new Rect(5, 0, 20, 20);
+        _component
+            .SetText("Hello World")
+            .SetScreenArea(value)
+            .ScreenArea.Should().Be(value);
     }
 
     [Fact]
-    public void SetScrollWithBindableProperty()
+    public void SetScreenAreaWithBindableProperty()
     {
-        var value = _fixture.Create<(int, int)>();
+        var value = new Rect(1, 0, 20, 20);
         var viewModel = new ViewModel();
 
-        _component.SetBindingContext(viewModel)
-            .SetScroll(ViewModel.ScrollProperty)
-            .SetScroll(value);
+        _component
+            .SetText("Hello\nWorld")
+            .SetBindingContext(viewModel)
+            .SetScreenArea(ViewModel.ScreenAreaProperty)
+            .SetScreenArea(value);
 
-        viewModel.Scroll.Should().Be(value);
+        viewModel.ScreenArea.Should().Be(value);
 
-        value = _fixture.Create<(int, int)>();
-        viewModel.Scroll = value;
-        viewModel.OnPropertyChanged(nameof(ViewModel.Scroll));
-        _component.Scroll.Should().Be(value);
+        value = new Rect(1, 2, 20, 20);
+        viewModel.ScreenArea = value;
+        viewModel.OnPropertyChanged(nameof(ViewModel.ScreenArea));
+        _component.ScreenArea.Should().Be(value);
     }
 
     [Fact]
-    public void SetScrollWithExpression()
+    public void SetScreenAreaWithExpression()
     {
-        var value = _fixture.Create<(int, int)>();
+        var value = new Rect(1, 0, 20, 20);
         var viewModel = new ViewModel();
 
         _component.SetBindingContext(viewModel)
-            .SetScroll<ViewModel>(vm => vm.Scroll)
-            .SetScroll(value);
+            .SetText("Hello\nWorld")
+            .SetScreenArea<ViewModel>(vm => vm.ScreenArea)
+            .SetScreenArea(value);
 
-        viewModel.Scroll.Should().Be(value);
+        viewModel.ScreenArea.Should().Be(value);
 
-        value = _fixture.Create<(int, int)>();
-        viewModel.Scroll = value;
-        viewModel.OnPropertyChanged(nameof(ViewModel.Scroll));
-        _component.Scroll.Should().Be(value);
+        value = new Rect(2, 1, 20, 20);
+        viewModel.ScreenArea = value;
+        viewModel.OnPropertyChanged(nameof(ViewModel.ScreenArea));
+        _component.ScreenArea.Should().Be(value);
     }
 
     [Fact]
-    public void SetScrollWithDelegate()
+    public void SetScreenAreaWithDelegate()
     {
-        var value = _fixture.Create<(int, int)>();
+        var value = new Rect(2, 1, 20, 20);
         var viewModel = new ViewModel();
 
         _component.SetBindingContext(viewModel)
-            .SetScroll<ViewModel>(
-                nameof(ViewModel.Scroll),
-                vm => vm.Scroll,
-                (vm, val) => vm.Scroll = val)
-            .SetScroll(value);
+            .SetText("Hello\nWorld")
+            .SetScreenArea<ViewModel>(
+                nameof(ViewModel.ScreenArea),
+                vm => vm.ScreenArea,
+                (vm, val) => vm.ScreenArea = val)
+            .SetScreenArea(value);
 
-        viewModel.Scroll.Should().Be(value);
+        viewModel.ScreenArea.Should().Be(value);
 
-        value = _fixture.Create<(int, int)>();
-        viewModel.Scroll = value;
-        viewModel.OnPropertyChanged(nameof(ViewModel.Scroll));
-        _component.Scroll.Should().Be(value);
+        value = new Rect(4, 0, 20, 20);
+        viewModel.ScreenArea = value;
+        viewModel.OnPropertyChanged(nameof(ViewModel.ScreenArea));
+        _component.ScreenArea.Should().Be(value);
     }
 
     [Fact]
-    public void SetScrollWithObjectDelegate()
+    public void SetScreenAreaWithObjectDelegate()
     {
-        var value = _fixture.Create<(int, int)>();
+        var value = new Rect(4, 0, 20, 20);
         var viewModel = new ViewModel();
 
         _component.SetBindingContext(viewModel)
-            .SetScroll(
-                nameof(ViewModel.Scroll),
+            .SetText("Hello\nWorld")
+            .SetScreenArea(
+                nameof(ViewModel.ScreenArea),
                 o =>
                 {
                     var vm = o.Should().BeOfType<ViewModel>().Subject;
-                    return vm.Scroll;
+                    return vm.ScreenArea;
                 },
                 (o, val) =>
                 {
                     var vm = o.Should().BeOfType<ViewModel>().Subject;
-                    vm.Scroll = val;
+                    vm.ScreenArea = val;
                 })
-            .SetScroll(value);
+            .SetScreenArea(value);
 
-        viewModel.Scroll.Should().Be(value);
+        viewModel.ScreenArea.Should().Be(value);
 
-        value = _fixture.Create<(int, int)>();
-        viewModel.Scroll = value;
-        viewModel.OnPropertyChanged(nameof(ViewModel.Scroll));
-        _component.Scroll.Should().Be(value);
+        value = new Rect(0, 1, 20, 20);
+        viewModel.ScreenArea = value;
+        viewModel.OnPropertyChanged(nameof(ViewModel.ScreenArea));
+        _component.ScreenArea.Should().Be(value);
     }
 
     #endregion
-
     public class ViewModel : INotifyPropertyChanged
     {
         public string Text { get; set; } = string.Empty;
@@ -1155,8 +1161,9 @@ public class EntryTest
         public string EchoCharacter { get; set; } = string.Empty;
         public string EndOfBufferCharacter { get; set; } = string.Empty;
         public CursorPosition CursorPosition { get; set; }
-        public (int Row, int Column)? Scroll { get; set; }
+        public Rect ScreenArea { get; set; } = new(0, 0, 0, 0);
         public Margin Margin { get; set; } = new(0, 0);
+        public bool SyncCursorPosition { get; set; }
 
         public static IBindableProperty<ViewModel, string> TextProperty { get; } =
             new BindableProperty<ViewModel, string>(nameof(Text),
@@ -1208,10 +1215,16 @@ public class EntryTest
                 viewModel => viewModel.Margin,
                 (viewModel, value) => viewModel.Margin = value);
 
-        public static IBindableProperty<ViewModel, (int, int)?> ScrollProperty { get; } =
-            new BindableProperty<ViewModel, (int, int)?>(nameof(Scroll),
-                viewModel => viewModel.Scroll,
-                (viewModel, value) => viewModel.Scroll = value);
+        public static IBindableProperty<ViewModel, Rect> ScreenAreaProperty { get; } =
+            new BindableProperty<ViewModel, Rect>(nameof(ScreenArea),
+                viewModel => viewModel.ScreenArea,
+                (viewModel, value) => viewModel.ScreenArea = value);
+
+        public static IBindableProperty<ViewModel, bool> SyncCursorPositionProperty { get; } =
+            new BindableProperty<ViewModel, bool>(nameof(SyncCursorPosition),
+                viewModel => viewModel.SyncCursorPosition,
+                (viewModel, value) => viewModel.SyncCursorPosition = value);
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

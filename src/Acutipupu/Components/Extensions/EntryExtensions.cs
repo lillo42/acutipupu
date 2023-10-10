@@ -779,80 +779,6 @@ public static class EntryExtensions
 
     #endregion
 
-    #region Scroll
-
-    /// <summary>
-    /// Change the <see cref="Entry.Scroll"/>.
-    /// </summary>
-    /// <param name="entry">The <see cref="Entry"/>.</param>
-    /// <param name="scroll">The scroll position.</param>
-    /// <returns>The given <paramref name="entry"/> with <see cref="Entry.Scroll"/> as <paramref name="scroll"/>.</returns>
-    public static Entry SetScroll(this Entry entry, (int Row, int Column)? scroll)
-    {
-        entry.Scroll = scroll;
-        return entry;
-    }
-
-    /// <summary>
-    /// Add binding to the <see cref="Entry.Scroll" />.
-    /// </summary>
-    /// <param name="entry">The <see cref="Label"/>.</param>
-    /// <param name="property">The <see cref="IBindableProperty"/>.</param>
-    /// <param name="mode">The <see cref="BindingMode"/>.</param>
-    /// <returns>The given <paramref name="entry"/> with <see cref="Entry.Scroll"/> binding with given information.</returns>
-    public static Entry SetScroll(this Entry entry, IBindableProperty property,
-        BindingMode mode = BindingMode.TwoWay)
-    {
-        entry.SetBinding(Entry.ScrollProperty, property, mode);
-        return entry;
-    }
-
-    /// <summary>
-    /// Add binding to the <see cref="Entry.Scroll" />.
-    /// </summary>
-    /// <param name="entry">The <see cref="Entry"/>.</param>
-    /// <param name="property">The getter view model property.</param>
-    /// <param name="mode">The <see cref="BindingMode"/>.</param>
-    /// <returns>The given <paramref name="entry"/> with <see cref="Entry.Scroll"/> binding with given information.</returns>
-    public static Entry SetScroll<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
-        TSource>(
-        this Entry entry, Expression<Func<TSource, (int Row, int Column)?>> property,
-        BindingMode mode = BindingMode.TwoWay)
-        => entry.SetBinding(Entry.ScrollProperty, property, mode);
-
-    /// <summary>
-    /// Add binding to the <see cref="Entry.Scroll" />.
-    /// </summary>
-    /// <param name="entry">The <see cref="Entry"/>.</param>
-    /// <param name="propertyName">The property name.</param>
-    /// <param name="getter">The getter view model property.</param>
-    /// <param name="setter">The setter view model property.</param>
-    /// <param name="mode">The <see cref="BindingMode"/>.</param>
-    /// <returns>The given <paramref name="entry"/> with <see cref="Entry.Scroll"/> binding with given information.</returns>
-    public static Entry SetScroll<TSource>(this Entry entry, string propertyName,
-        Func<TSource, (int Row, int Column)?>? getter = null,
-        Action<TSource, (int Row, int Column)?>? setter = null,
-        BindingMode mode = BindingMode.TwoWay)
-        => entry.SetBinding(Entry.ScrollProperty, propertyName, getter, setter, mode);
-
-    /// <summary>
-    /// Add binding to the <see cref="Entry.Scroll" />.
-    /// </summary>
-    /// <param name="entry">The <see cref="Entry"/>.</param>
-    /// <param name="propertyName">The property name.</param>
-    /// <param name="getter">The getter view model property.</param>
-    /// <param name="setter">The setter view model property.</param>
-    /// <param name="mode">The <see cref="BindingMode"/>.</param>
-    /// <returns>The given <paramref name="entry"/> with <see cref="Entry.Scroll"/> binding with given information.</returns>
-    public static Entry SetScroll(this Entry entry, string propertyName,
-        Func<object, (int Row, int Column)?>? getter = null,
-        Action<object, (int Row, int Column)?>? setter = null,
-        BindingMode mode = BindingMode.TwoWay)
-        => entry.SetBinding(Entry.ScrollProperty, propertyName, getter, setter, mode);
-
-    #endregion
-
     #region LastColumnPosition
 
     /// <summary>
@@ -861,7 +787,7 @@ public static class EntryExtensions
     /// <param name="entry">The <see cref="Entry"/>.</param>
     /// <param name="columnPosition">The <see cref="IColumnPosition"/>.</param>
     /// <returns>The given <paramref name="entry"/> with <see cref="Entry.LastColumnPosition"/> as <paramref name="columnPosition"/>.</returns>
-    public static Entry SetLastColumnPosition(this Entry entry, IColumnPosition columnPosition)
+    public static Entry SetLastColumnPosition(this Entry entry, AtColumnPosition columnPosition)
     {
         entry.LastColumnPosition = columnPosition;
         return entry;
@@ -891,7 +817,7 @@ public static class EntryExtensions
     public static Entry SetLastColumnPosition<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
         TSource>(
-        this Entry entry, Expression<Func<TSource, IColumnPosition>> property,
+        this Entry entry, Expression<Func<TSource, AtColumnPosition>> property,
         BindingMode mode = BindingMode.TwoWay)
         => entry.SetBinding(Entry.LastColumnPositionProperty, property, mode);
 
@@ -905,8 +831,8 @@ public static class EntryExtensions
     /// <param name="mode">The <see cref="BindingMode"/>.</param>
     /// <returns>The given <paramref name="entry"/> with <see cref="Entry.LastColumnPosition"/> binding with given information.</returns>
     public static Entry SetLastColumnPosition<TSource>(this Entry entry, string propertyName,
-        Func<TSource, IColumnPosition>? getter = null,
-        Action<TSource, IColumnPosition>? setter = null,
+        Func<TSource, AtColumnPosition>? getter = null,
+        Action<TSource, AtColumnPosition>? setter = null,
         BindingMode mode = BindingMode.TwoWay)
         => entry.SetBinding(Entry.LastColumnPositionProperty, propertyName, getter, setter, mode);
 
@@ -920,8 +846,8 @@ public static class EntryExtensions
     /// <param name="mode">The <see cref="BindingMode"/>.</param>
     /// <returns>The given <paramref name="entry"/> with <see cref="Entry.LastColumnPosition"/> binding with given information.</returns>
     public static Entry SetLastColumnPosition(this Entry entry, string propertyName,
-        Func<object, IColumnPosition>? getter = null,
-        Action<object, IColumnPosition>? setter = null,
+        Func<object, AtColumnPosition>? getter = null,
+        Action<object, AtColumnPosition>? setter = null,
         BindingMode mode = BindingMode.TwoWay)
         => entry.SetBinding(Entry.LastColumnPositionProperty, propertyName, getter, setter, mode);
 
@@ -1000,6 +926,7 @@ public static class EntryExtensions
         => entry.SetBinding(Entry.ScreenAreaProperty, propertyName, getter, setter, mode);
 
     #endregion
+
 }
 
 /// <summary>

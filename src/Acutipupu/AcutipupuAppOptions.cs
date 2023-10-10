@@ -41,17 +41,14 @@ public class AcutipupuAppOptions
     }
 
     /// <summary>
-    /// The key filter.
-    /// </summary>
-    public Func<KeyMessage, bool> KeyFilter { get; set; } = message => message.Kind == KeyEventKind.Press;
-
-    /// <summary>
     /// The text movement key map.
     /// </summary>
-    public TextKeyMap TextKeyMap { get; set; } = new();
+    public EntryKeyMap EntryKeyMap { get; set; } = new();
     
     /// <summary>
     /// The navigation key map.
     /// </summary>
     public NavigationKeyMap NavigationKeyMap { get; set; } = new();
+    
+    
 }

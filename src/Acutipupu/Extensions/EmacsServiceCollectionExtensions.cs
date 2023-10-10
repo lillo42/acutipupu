@@ -1,4 +1,5 @@
-﻿using Acutipupu.SystemBehaviors;
+﻿using Acutipupu.Behaviors.Entry;
+using Acutipupu.SystemBehaviors;
 using Acutipupu.SystemBehaviors.Emacs;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,7 +35,7 @@ public static class EmacsServiceCollectionExtensions
                 servicesToBeRemoved.Add(descriptor);
             }
 
-            if (descriptor.ImplementationType!.IsAssignableTo(typeof(ITextCommand)))
+            if (descriptor.ImplementationType!.IsAssignableTo(typeof(EntryCommand)))
             {
                 servicesToBeRemoved.Add(descriptor);
             }
