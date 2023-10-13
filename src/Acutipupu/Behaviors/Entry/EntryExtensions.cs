@@ -1,7 +1,5 @@
 ﻿using Acutipupu.Components;
-using Acutipupu.SystemBehaviors;
 using Boto.Layouts;
-using Boto.Terminals;
 
 namespace Acutipupu.Behaviors.Entry;
 
@@ -60,60 +58,23 @@ public static class EntryExtensions
     }
 
     /// <summary>
-    /// Calculate what should be cursor position inside <see cref="Entry.ScreenArea"/> respecting <see cref="Entry.Margin"/>.
+    /// Calculate the index text position based on <see cref="Entry.CursorPosition"/>.
     /// </summary>
     /// <param name="entry">The <see cref="Components.Entry"/>.</param>
-    /// <param name="lastTextColumn">The <see cref="ILastTextColumn"/>.</param>
-    /// <returns>A new <see cref="Boto.Terminals.CursorPosition"/>.</returns>
-    public static CursorPosition CalculateCursorPosition(this Components.Entry entry, ILastTextColumn lastTextColumn)
+    /// <returns>The text index position.</returns>
+    public static int CalculateIndexTextPosition(this Components.Entry entry)
     {
-        var indexes = entry.Indexes;
-        if (indexes.Count == 0)
+        var (row, col) = entry.CursorPosition;
+        var text = entry.Text;
+        var index = 0;
+
+        while (index < row)
         {
-            return new CursorPosition(0, 0);
+            index = text.IndexOf('\n', index) + 1;
         }
 
-        var value = entry.ScreenArea;
-        var margin = entry.Margin;
-        var cursorPosition = entry.CursorPosition;
+        index += col;
 
-        var topWithMargin = Math.Min(value.Top + margin.Vertical, indexes.Count - 1);
-        var bottomWithMargin = Math.Clamp(value.Bottom - margin.Vertical, 0, indexes.Count - 1);
-
-        if (value.Height <= margin.Vertical * 2 + 1)
-        {
-            topWithMargin = value.Top;
-            bottomWithMargin = value.Bottom;
-        }
-
-        if (topWithMargin > cursorPosition.Row)
-        {
-            cursorPosition = cursorPosition with { Row = topWithMargin };
-        }
-        else if (bottomWithMargin < cursorPosition.Row)
-        {
-            cursorPosition = cursorPosition with { Row = bottomWithMargin };
-        }
-        
-        var maxCol = lastTextColumn.LastColumn(indexes[cursorPosition.Row].Length);
-        var leftWithMargin = Math.Min(value.Left + margin.Horizontal, maxCol);
-        var rightWithMargin = Math.Clamp(value.Right - margin.Horizontal, 0, maxCol);
-
-        if (value.Width <= margin.Horizontal * 2 + 1)
-        {
-            leftWithMargin = value.Left;
-            rightWithMargin = value.Right;
-        }
-
-        if (leftWithMargin > cursorPosition.Column)
-        {
-            cursorPosition = cursorPosition with { Column = leftWithMargin };
-        }
-        else if (rightWithMargin < cursorPosition.Column)
-        {
-            cursorPosition = cursorPosition with { Column = rightWithMargin };
-        }
-
-        return cursorPosition;
+        return index;
     }
 }

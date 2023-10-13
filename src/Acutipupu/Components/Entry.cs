@@ -15,14 +15,15 @@ namespace Acutipupu.Components;
 /// <summary>
 /// The input component.
 /// </summary>
-public partial class Entry : Component, INavegable, ITextChanged, IStyled 
+public partial class Entry : Component, INavegable, ITextChanged, IStyled
 {
     private Text _finalText;
     private readonly Paragraph _paragraph = new();
     private readonly StringBuilder _sb = new();
-    private readonly List<int[]> _indexes = new();
 
-    /// <inheritdoc />
+    /// <summary>
+    /// The text indexes.
+    /// </summary>
     public ImmutableList<ImmutableArray<int>> Indexes { get; private set; } = ImmutableList<ImmutableArray<int>>.Empty;
 
     /// <summary>
@@ -90,6 +91,11 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled
     /// It is used to calculate the area where the cursor is visible.
     /// </remarks>
     [ObservableProperty] private Rect _screenArea = new(0, 0, 0, 0);
+
+    /// <summary>
+    /// The new line character.
+    /// </summary>
+    [ObservableProperty] private string? _newLine;
 
     /// <summary>
     /// Initialize a new instance of <see cref="Entry"/>.
@@ -215,6 +221,15 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled
             input => input.ScreenArea,
             (input, value) => input.ScreenArea = value);
 
+    /// <summary>
+    /// The <see cref="NewLine"/> <see cref="IBindableProperty{TSource,TProperty}"/>.
+    /// </summary>
+    public static IBindableProperty<Entry, string?> NewLineProperty { get; } =
+        new BindableProperty<Entry, string?>(
+            nameof(NewLine),
+            input => input.NewLine,
+            (input, value) => input.NewLine = value);
+
     partial void OnStyleChanging(EntryStyle? oldValue, EntryStyle newValue)
     {
         if (oldValue is not null)
@@ -239,51 +254,44 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled
         _sb.Clear();
         _sb.Append(value);
 
-        _indexes.Clear();
-
-        var newLineAt = value.IndexOf('\n');
-        if (newLineAt == -1)
+        var hasNewLine = value.IndexOf('\n') == -1;
+        if (!hasNewLine)
         {
-            _indexes.Add(StringInfo.ParseCombiningCharacters(value));
             Indexes = ImmutableList<ImmutableArray<int>>.Empty
                 .Add(StringInfo.ParseCombiningCharacters(value).ToImmutableArray());
         }
         else
         {
+            var indexes = new List<int[]>();
             var builder = new List<int>();
             var visiblePosition = StringInfo.ParseCombiningCharacters(value);
             var visiblePositionIndex = 0;
-            while (visiblePositionIndex < visiblePosition.Length)
+            var valueIndex = 0;
+            while (valueIndex < value.Length)
             {
-                var position = visiblePosition[visiblePositionIndex];
-                if (char.IsControl(value[position]) || value[position] == '\n')
+                if (value[valueIndex] == '\n')
                 {
-                    visiblePositionIndex++;
-                    continue;
-                }
-
-                if (position < newLineAt || newLineAt == -1)
-                {
-                    visiblePositionIndex++;
-                    builder.Add(position);
-                }
-                else
-                {
-                    newLineAt = value.IndexOf('\n', newLineAt + 1);
-                    _indexes.Add(builder.ToArray());
+                    indexes.Add(builder.ToArray());
                     builder.Clear();
                 }
+
+                var position = visiblePosition[visiblePositionIndex];
+                if (valueIndex == position)
+                {
+                    var ch = value[position];
+                    if (!char.IsControl(ch) && ch != '\n')
+                    {
+                        builder.Add(position);
+                    }
+
+                    visiblePositionIndex++;
+                }
+
+                valueIndex++;
             }
 
-            _indexes.Add(builder.ToArray());
-            builder.Clear();
-
-            if (newLineAt == value.Length - 1)
-            {
-                _indexes.Add(Array.Empty<int>());
-            }
-
-            Indexes = _indexes.Select(x => x.ToImmutableArray())
+            indexes.Add(builder.ToArray());
+            Indexes = indexes.Select(x => x.ToImmutableArray())
                 .ToImmutableList();
         }
 
@@ -333,12 +341,12 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled
 
     partial void OnCursorPositionChanging(CursorPosition value)
     {
-        if (value.Row != 0 && value.Row >= _indexes.Count)
+        if (value.Row != 0 && value.Row >= Indexes.Count)
         {
             throw new ArgumentException("Row is out of range");
         }
 
-        if (value.Column != 0 && value.Column > _indexes[value.Row].Length)
+        if (value.Column != 0 && value.Column > Indexes[value.Row].Length)
         {
             throw new ArgumentException("Column is out of range");
         }
@@ -351,7 +359,7 @@ public partial class Entry : Component, INavegable, ITextChanged, IStyled
             throw new InvalidOperationException("Y is out of range");
         }
 
-        var maxCol = Indexes.MaxBy(x => x.Length);
+        var maxCol = Indexes.Count == 0 ? ImmutableArray<int>.Empty : Indexes.MaxBy(x => x.Length);
         if (value.X < 0 || value.X > maxCol.Length)
         {
             throw new InvalidOperationException("X is out of range");

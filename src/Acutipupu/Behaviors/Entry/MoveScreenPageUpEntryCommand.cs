@@ -3,7 +3,6 @@ using Acutipupu.Bindings;
 using Acutipupu.Extensions;
 using Acutipupu.Messages;
 using Acutipupu.SystemBehaviors;
-using Boto.Terminals;
 using Microsoft.Extensions.Options;
 
 namespace Acutipupu.Behaviors.Entry;

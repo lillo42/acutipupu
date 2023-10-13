@@ -1,7 +1,5 @@
 ﻿using System.Text;
-using Acutipupu.Messages;
 using Acutipupu.SystemBehaviors;
-using Tutu.Events;
 
 namespace Acutipupu;
 
@@ -24,6 +22,11 @@ public class AcutipupuAppOptions
     public int FrameRate { get; set; } = 120;
 
     /// <summary>
+    /// The new line string.
+    /// </summary>
+    public string NewLine { get; set; } = Environment.NewLine;
+
+    /// <summary>
     /// The <see cref="StartupOptions"/>.
     /// </summary>
     public StartupOptions StartupOptions { get; set; } = StartupOptions.WithAltScreen
@@ -44,11 +47,9 @@ public class AcutipupuAppOptions
     /// The text movement key map.
     /// </summary>
     public EntryKeyMap EntryKeyMap { get; set; } = new();
-    
+
     /// <summary>
     /// The navigation key map.
     /// </summary>
     public NavigationKeyMap NavigationKeyMap { get; set; } = new();
-    
-    
 }

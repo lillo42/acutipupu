@@ -31,7 +31,7 @@ public abstract class MoveCursorPreviousOccurenceInCurrentLineEntryCommand : Ent
     protected virtual bool AfterTheOccurence { get; init; }
 
     /// <inheritdoc/>
-    protected override KeyBindingCollection GetKey(EntryKeyMap map) => map.NextCharOccurence;
+    protected override KeyBindingCollection GetKey(EntryKeyMap map) => map.PreviousCharOccurence;
 
     /// <inheritdoc/>
     protected override void OnExecute(ImmutableList<KeyMessage> keys, Components.Entry entry)

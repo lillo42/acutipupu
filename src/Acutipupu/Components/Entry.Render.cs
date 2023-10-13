@@ -1,5 +1,4 @@
-﻿using Acutipupu.Behaviors.Entry;
-using Boto.Terminals;
+﻿using Boto.Terminals;
 using Boto.Texts;
 using Boto.Widgets.Extensions;
 
@@ -28,7 +27,7 @@ public partial class Entry
         var area = context.Area;
         if (MultiLine)
         {
-            while (_finalText.Lines.Count < _indexes.Count + area.Height)
+            while (_finalText.Lines.Count < Indexes.Count + area.Height)
             {
                 _finalText.Lines.Add(new Spans(EndOfBufferCharacter));
             }

@@ -91,4 +91,9 @@ public class EntryKeyMap
     /// The key binding to move the cursor to the previous character occurence.
     /// </summary>
     public KeyBindingCollection PreviousCharOccurence { get; set; } = new();
+    
+    /// <summary>
+    /// The key binding to insert new line.
+    /// </summary>
+    public KeyBindingCollection NewLine { get; set; } = new();
 }

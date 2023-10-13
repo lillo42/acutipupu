@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
+using Acutipupu.Bindings;
 using Acutipupu.Extensions;
 using Acutipupu.Messages;
+using Acutipupu.SystemBehaviors;
 using Boto.Terminals;
 using Microsoft.Extensions.Options;
 using Tutu.Events;
@@ -27,6 +29,9 @@ public abstract class MoveCursorNextOccurenceInCurrentLineEntryCommand : EntryCo
     /// Move the cursor to the char before the text.
     /// </summary>
     protected virtual bool BeforeTheOccurence { get; init; }
+
+    /// <inheritdoc/>
+    protected override KeyBindingCollection GetKey(EntryKeyMap map) => map.NextCharOccurence;
 
     /// <inheritdoc/>
     protected override void OnExecute(ImmutableList<KeyMessage> keys, Components.Entry entry)
